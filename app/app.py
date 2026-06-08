@@ -1,9 +1,6 @@
-from flask import Flask
-from healthcheck import HealthCheck
+from flask import Flask, jsonify
 
 app = Flask(__name__)
-
-health = HealthCheck()
 
 
 @app.route("/")
@@ -11,7 +8,10 @@ def index():
     return "response from index page"
 
 
-app.add_url_rule("/health", "healthcheck", view_func=lambda: health.run())
+@app.route("/health")
+def healthcheck():
+    return jsonify({"status": "healthy"}), 200
+
 
 if __name__ == "__main__":
     app.run()
