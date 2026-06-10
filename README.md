@@ -230,3 +230,23 @@ Basic Docker commands are documented in the README.
 Automate testing and Docker image building using GitHub Actions so every code change is checkedconsistently.
 This milestone introduces the first version of the CI/CD pipeline. The pipeline does not need to deploy yet. The
 purpose is to make sure the project is automatically tested and can successfully build a Docker image whenever code is pushed or a pull request is opened
+
+### Success Criteria
+**A pull request should automatically trigger GitHub Actions. The test job and Docker build job must both pass before the change is considered ready to merge.**
+
+**Update branch protection rules**
+Require pull request before merging.\
+Require at least one approval.\
+Require status checks to pass before merging.\
+Select the CI Pipeline checks once they appear in GitHub.\
+Block force pushes and branch deletion.
+
+### Outcomes
+.github/workflows/ci.yml exists.\
+Pipeline runs on push and pull request.\
+Python dependencies are installed in the pipeline.\
+Pytest runs successfully in GitHub Actions.\
+Docker image builds successfully in GitHub Actions.\
+Docker build depends on the test job passing.\
+Pull requests show pipeline status checks.\
+README explains how the CI pipeline works.
