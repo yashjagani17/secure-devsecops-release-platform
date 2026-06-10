@@ -1,7 +1,7 @@
 # secure-devsecops-release-platform
 simple web application wrapped in a secure software delivery workflow
 
-# Milestone 1
+# Milestone 1: Application Setup
 ### Goal
 Create a simple web application that will be used to demonstrate the DevSecOps pipeline. The application does not need to be complex. The main purpose is to have a small working app that can later be tested, containerised, scanned, deployed, and monitored.
 
@@ -52,7 +52,7 @@ A requirements.txt file.\
 A simple README file.\
 The app running locally
 
-# Milestone 2
+# Milestone 2: GitHub Setup, Version Control and Testing
 ### Goal
 Set up GitHub properly, store the project code in a repository, and add basic automated tests. This milestone makes sure the project is organised, trackable, and ready for CI/CD later
 
@@ -101,7 +101,7 @@ Unit tests added.\
 Tests running locally.
 README updated
 
-# Milestone 3
+# Milestone 3: Containerisation
 ### Goal
 Package the Flask application into a Docker image so it can run consistently on any machine or deployment environment. This milestone moves the project from a locally running Python application to a portable containerised service. The team should focus on creating a clean Dockerfile, running the app inside Docker, and confirming the health check works from the container.
 
@@ -224,3 +224,9 @@ Docker image builds successfully.\
 Container runs locally on port 5000.\
 Home endpoint and /health endpoint work from the container.\
 Basic Docker commands are documented in the README.
+
+# Milestone 4: CI/CD Pipeline
+### Goal
+Automate testing and Docker image building using GitHub Actions so every code change is checkedconsistently.
+This milestone introduces the first version of the CI/CD pipeline. The pipeline does not need to deploy yet. The
+purpose is to make sure the project is automatically tested and can successfully build a Docker image whenever code is pushed or a pull request is opened
