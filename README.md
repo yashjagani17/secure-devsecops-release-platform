@@ -241,6 +241,261 @@ Require status checks to pass before merging.\
 Select the CI Pipeline checks once they appear in GitHub.\
 Block force pushes and branch deletion.
 
+**Running application tests**\
+Set up job
+```sh
+Current runner version: '2.335.1'
+Runner Image Provisioner
+Operating System
+Runner Image
+GITHUB_TOKEN Permissions
+Secret source: Actions
+Prepare workflow directory
+Prepare all required actions
+Getting action download info
+Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+Complete job name: Run application tests
+```
+Checkout code
+```sh
+Run actions/checkout@v4
+Syncing repository: yashjagani17/secure-devsecops-release-platform
+Getting Git version info
+Temporarily overriding HOME='/home/runner/work/_temp/b3313db2-a370-4f2c-bcd1-0000e39cc3f1' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+/usr/bin/git config --global --add safe.directory /home/runner/work/secure-devsecops-release-platform/secure-devsecops-release-platform
+Deleting the contents of '/home/runner/work/secure-devsecops-release-platform/secure-devsecops-release-platform'
+Initializing the repository
+Disabling automatic garbage collection
+Setting up auth
+Fetching the repository
+Determining the checkout info
+/usr/bin/git sparse-checkout disable
+/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Checking out the ref
+/usr/bin/git log -1 --format=%H
+fc26565bcaf3be96687f9f29350a8c2081430450
+```
+Set up Python
+```sh
+Run actions/setup-python@v5
+Installed versions
+```
+Install dependencies
+```sh
+Run pip install -r app/requirements.txt
+Collecting blinker==1.9.0 (from -r app/requirements.txt (line 1))
+  Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting click==8.4.1 (from -r app/requirements.txt (line 2))
+  Downloading click-8.4.1-py3-none-any.whl.metadata (2.6 kB)
+Collecting Flask==3.1.3 (from -r app/requirements.txt (line 3))
+  Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+Collecting iniconfig==2.3.0 (from -r app/requirements.txt (line 4))
+  Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting itsdangerous==2.2.0 (from -r app/requirements.txt (line 5))
+  Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting Jinja2==3.1.6 (from -r app/requirements.txt (line 6))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting MarkupSafe==3.0.3 (from -r app/requirements.txt (line 7))
+  Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+Collecting packaging==26.2 (from -r app/requirements.txt (line 8))
+  Downloading packaging-26.2-py3-none-any.whl.metadata (3.5 kB)
+Collecting pluggy==1.6.0 (from -r app/requirements.txt (line 9))
+  Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting Pygments==2.20.0 (from -r app/requirements.txt (line 10))
+  Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting pytest==9.0.3 (from -r app/requirements.txt (line 11))
+  Downloading pytest-9.0.3-py3-none-any.whl.metadata (7.6 kB)
+Collecting six==1.17.0 (from -r app/requirements.txt (line 12))
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting Werkzeug==3.1.8 (from -r app/requirements.txt (line 13))
+  Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Downloading click-8.4.1-py3-none-any.whl (116 kB)
+Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+Downloading packaging-26.2-py3-none-any.whl (100 kB)
+Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 117.0 MB/s  0:00:00
+Downloading pytest-9.0.3-py3-none-any.whl (375 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+Installing collected packages: six, Pygments, pluggy, packaging, MarkupSafe, itsdangerous, iniconfig, click, blinker, Werkzeug, pytest, Jinja2, Flask
+
+Successfully installed Flask-3.1.3 Jinja2-3.1.6 MarkupSafe-3.0.3 Pygments-2.20.0 Werkzeug-3.1.8 blinker-1.9.0 click-8.4.1 iniconfig-2.3.0 itsdangerous-2.2.0 packaging-26.2 pluggy-1.6.0 pytest-9.0.3 six-1.17.0
+```
+Run tests
+```sh
+Run pytest
+============================= test session starts ==============================
+platform linux -- Python 3.12.13, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/runner/work/secure-devsecops-release-platform/secure-devsecops-release-platform
+collected 2 items
+
+test/test_app.py ..                                                      [100%]
+
+============================== 2 passed in 0.11s ===============================
+```
+**Building the Docker image**\
+Set up job
+```sh
+Current runner version: '2.334.0'
+Runner Image Provisioner
+Operating System
+Runner Image
+GITHUB_TOKEN Permissions
+Secret source: Actions
+Prepare workflow directory
+Prepare all required actions
+Getting action download info
+Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+Complete job name: Build Docker image
+```
+Checkout code
+```sh
+Run actions/checkout@v4
+Syncing repository: yashjagani17/secure-devsecops-release-platform
+Getting Git version info
+Temporarily overriding HOME='/home/runner/work/_temp/e6338eb2-92f2-4fbb-be80-e34ec7c20790' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+/usr/bin/git config --global --add safe.directory /home/runner/work/secure-devsecops-release-platform/secure-devsecops-release-platform
+Deleting the contents of '/home/runner/work/secure-devsecops-release-platform/secure-devsecops-release-platform'
+Initializing the repository
+Disabling automatic garbage collection
+Setting up auth
+Fetching the repository
+Determining the checkout info
+/usr/bin/git sparse-checkout disable
+/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Checking out the ref
+/usr/bin/git log -1 --format=%H
+fc26565bcaf3be96687f9f29350a8c2081430450
+```
+Build Docker image
+```sh
+Run docker build -t secure-devsecops-release-platform:fc26565bcaf3be96687f9f29350a8c2081430450 .
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 315B done
+#1 DONE 0.0s
+
+#2 [auth] library/python:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 108B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 610B done
+#5 DONE 0.0s
+
+#6 [1/6] FROM docker.io/library/python:3.12-slim@sha256:090ba77e2958f6af52a5341f788b50b032dd4ca28377d2893dcf1ecbdfdfe203
+#6 resolve docker.io/library/python:3.12-slim@sha256:090ba77e2958f6af52a5341f788b50b032dd4ca28377d2893dcf1ecbdfdfe203 done
+#6 sha256:e113665b194b20ba7e9093ef6a1a38edbaebbfb983c00e379a45a142a95a86ef 2.10MB / 12.11MB 0.1s
+#6 sha256:07342fe545e640a2c4960e97ffe33a301cd8e61e0c4d4307d7ac66b6b8a9eb2d 0B / 250B 0.1s
+#6 sha256:090ba77e2958f6af52a5341f788b50b032dd4ca28377d2893dcf1ecbdfdfe203 10.37kB / 10.37kB done
+#6 sha256:866411c135b507754efdf2fda51484be4d3d7d5173ed53cd083106132e710904 1.75kB / 1.75kB done
+#6 sha256:e1054bc5a9f2ddbdd6d0247997c45f2201a4e9b4c6f824b247064a558e877070 5.65kB / 5.65kB done
+#6 sha256:5b4d6ff92fc4e14e911b7753c954fac965d48c40fe1075758d284148ccace970 22.02MB / 29.78MB 0.1s
+#6 sha256:4a9dde5cdde190bfa0a3ab17863a083e66ea9636b157638c315357dfa476ba76 1.29MB / 1.29MB 0.1s done
+#6 sha256:e113665b194b20ba7e9093ef6a1a38edbaebbfb983c00e379a45a142a95a86ef 12.11MB / 12.11MB 0.1s done
+#6 sha256:07342fe545e640a2c4960e97ffe33a301cd8e61e0c4d4307d7ac66b6b8a9eb2d 250B / 250B 0.1s done
+#6 sha256:5b4d6ff92fc4e14e911b7753c954fac965d48c40fe1075758d284148ccace970 29.78MB / 29.78MB 0.1s done
+#6 extracting sha256:5b4d6ff92fc4e14e911b7753c954fac965d48c40fe1075758d284148ccace970 0.1s
+#6 extracting sha256:5b4d6ff92fc4e14e911b7753c954fac965d48c40fe1075758d284148ccace970 1.0s done
+#6 extracting sha256:4a9dde5cdde190bfa0a3ab17863a083e66ea9636b157638c315357dfa476ba76
+#6 extracting sha256:4a9dde5cdde190bfa0a3ab17863a083e66ea9636b157638c315357dfa476ba76 0.1s done
+#6 extracting sha256:e113665b194b20ba7e9093ef6a1a38edbaebbfb983c00e379a45a142a95a86ef
+#6 extracting sha256:e113665b194b20ba7e9093ef6a1a38edbaebbfb983c00e379a45a142a95a86ef 0.6s done
+#6 extracting sha256:07342fe545e640a2c4960e97ffe33a301cd8e61e0c4d4307d7ac66b6b8a9eb2d
+#6 extracting sha256:07342fe545e640a2c4960e97ffe33a301cd8e61e0c4d4307d7ac66b6b8a9eb2d done
+#6 DONE 2.0s
+
+#7 [2/6] RUN adduser --disabled-password app
+#7 0.224 Changing the user information for app
+#7 0.224 Enter the new value, or press ENTER for the default
+#7 0.224 	Full Name []: 	Room Number []: 	Work Phone []: 	Home Phone []: 	Other []: Use of uninitialized value $answer in chop at /usr/sbin/adduser line 992.
+#7 0.228 Is the information correct? [Y/n] Use of uninitialized value $answer in pattern match (m//) at /usr/sbin/adduser line 993.
+#7 0.228 Use of uninitialized value $answer in pattern match (m//) at /usr/sbin/adduser line 994.
+#7 DONE 0.3s
+
+#8 [3/6] WORKDIR /app
+#8 DONE 0.0s
+
+#9 [4/6] COPY --chown=app:app app/requirements.txt .
+#9 DONE 0.0s
+
+#10 [5/6] RUN pip install --no-cache-dir -r requirements.txt
+#10 1.555 Collecting blinker==1.9.0 (from -r requirements.txt (line 1))
+#10 1.577   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+#10 1.592 Collecting click==8.4.1 (from -r requirements.txt (line 2))
+#10 1.596   Downloading click-8.4.1-py3-none-any.whl.metadata (2.6 kB)
+#10 1.609 Collecting Flask==3.1.3 (from -r requirements.txt (line 3))
+#10 1.612   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+#10 1.620 Collecting iniconfig==2.3.0 (from -r requirements.txt (line 4))
+#10 1.624   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+#10 1.632 Collecting itsdangerous==2.2.0 (from -r requirements.txt (line 5))
+#10 1.635   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#10 1.648 Collecting Jinja2==3.1.6 (from -r requirements.txt (line 6))
+#10 1.652   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#10 1.694 Collecting MarkupSafe==3.0.3 (from -r requirements.txt (line 7))
+#10 1.699   Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#10 1.711 Collecting packaging==26.2 (from -r requirements.txt (line 8))
+#10 1.715   Downloading packaging-26.2-py3-none-any.whl.metadata (3.5 kB)
+#10 1.725 Collecting pluggy==1.6.0 (from -r requirements.txt (line 9))
+#10 1.729   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+#10 1.746 Collecting Pygments==2.20.0 (from -r requirements.txt (line 10))
+#10 1.750   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+#10 1.779 Collecting pytest==9.0.3 (from -r requirements.txt (line 11))
+#10 1.783   Downloading pytest-9.0.3-py3-none-any.whl.metadata (7.6 kB)
+#10 1.795 Collecting six==1.17.0 (from -r requirements.txt (line 12))
+#10 1.799   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#10 1.818 Collecting Werkzeug==3.1.8 (from -r requirements.txt (line 13))
+#10 1.822   Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+#10 1.860 Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#10 1.864 Downloading click-8.4.1-py3-none-any.whl (116 kB)
+#10 1.870 Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+#10 1.874 Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+#10 1.878 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#10 1.882 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#10 1.885 Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#10 1.889 Downloading packaging-26.2-py3-none-any.whl (100 kB)
+#10 1.893 Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+#10 1.897 Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+#10 1.907    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 189.2 MB/s eta 0:00:00
+#10 1.911 Downloading pytest-9.0.3-py3-none-any.whl (375 kB)
+#10 1.915 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#10 1.919 Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+#10 1.954 Installing collected packages: six, Pygments, pluggy, packaging, MarkupSafe, itsdangerous, iniconfig, click, blinker, Werkzeug, pytest, Jinja2, Flask
+#10 3.334 Successfully installed Flask-3.1.3 Jinja2-3.1.6 MarkupSafe-3.0.3 Pygments-2.20.0 Werkzeug-3.1.8 blinker-1.9.0 click-8.4.1 iniconfig-2.3.0 itsdangerous-2.2.0 packaging-26.2 pluggy-1.6.0 pytest-9.0.3 six-1.17.0
+#10 3.334 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#10 3.413 
+#10 3.413 [notice] A new release of pip is available: 25.0.1 -> 26.1.2
+#10 3.413 [notice] To update, run: pip install --upgrade pip
+#10 DONE 3.5s
+
+#11 [6/6] COPY --chown=app:app app/ .
+#11 DONE 0.0s
+
+#12 exporting to image
+#12 exporting layers
+#12 exporting layers 0.7s done
+#12 writing image sha256:31ec70639222addd3c2708577736de9c7386068cdc314189deed002872f6a4b4 done
+#12 naming to docker.io/library/secure-devsecops-release-platform:fc26565bcaf3be96687f9f29350a8c2081430450 done
+#12 DONE 0.7s
+```
+
+
 ### Outcomes
 .github/workflows/ci.yml exists.\
 Pipeline runs on push and pull request.\
