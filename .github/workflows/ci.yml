@@ -33,16 +33,25 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install vulnerability scan dependencies
-        run: pip install bandit pip-audit
-      - name: Run code vulnerability scan to warn up to medium vulnerabilities
-        run: bandit -r app/ -ii || true
-      - name: Run dependency vulnerability scan to warn up to medium vulnerabilities
-        run: pip-audit -r app/requirements.txt --vulnerability-threshold MEDIUM || true
-      - name: Run code vulnerability scan to fail for high/critical vulnerabilities
-        run: bandit -r app/ -ll -iii
-      - name: Run dependency vulnerability scan to fail for high/critical vulnerabilities
-        run: pip-audit -r app/requirements.txt --vulnerability-threshold HIGH
+      # - name: Install vulnerability scan dependencies
+      - name: Code vulnerability scan
+        uses: PyCQA/bandit-action@v1.0.1
+        with:
+          targets: app/
+          severity: high
+      - name: Dependency vulnerability scan
+        uses: pypa/pip-audit-action@v1.1.0
+        with:
+          inputs: app/requirements.txt
+      #   run: pip install bandit pip-audit
+      # - name: Run code vulnerability scan to warn up to medium vulnerabilities
+      #   run: bandit -r app/ -ii || true
+      # - name: Run dependency vulnerability scan to warn up to medium vulnerabilities
+      #   run: pip-audit -r app/requirements.txt --vulnerability-threshold MEDIUM || true
+      # - name: Run code vulnerability scan to fail for high/critical vulnerabilities
+      #   run: bandit -r app/ -ll -iii
+      # - name: Run dependency vulnerability scan to fail for high/critical vulnerabilities
+      #   run: pip-audit -r app/requirements.txt --vulnerability-threshold HIGH
   docker-build:
     name: Build Docker image
     runs-on: ubuntu-latest
