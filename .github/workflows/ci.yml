@@ -24,7 +24,7 @@ jobs:
       - name: Run tests
         run: pytest
   code-scan:
-    name: Run vulnerability scans
+    name: Run application vulnerability scans
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -35,16 +35,12 @@ jobs:
           python-version: "3.12"
       - name: Install vulnerability scan dependencies
         run: pip install bandit pip-audit
-      - name: Run code vulnerability scan to warn up to medium vulnerabilities
-        run: bandit -r app/ -ii || true
-      - name: Run dependency vulnerability scan to warn up to medium vulnerabilities
-        run: pip-audit -r app/requirements.txt --vulnerability-threshold MEDIUM || true
-      - name: Run code vulnerability scan to fail for high/critical vulnerabilities
-        run: bandit -r app/ -ll -iii
-      - name: Run dependency vulnerability scan to fail for high/critical vulnerabilities
-        run: pip-audit -r app/requirements.txt --vulnerability-threshold HIGH
-  docker-build:
-    name: Build Docker image
+      - name: Run code vulnerability scan
+        run: bandit -r app/
+      - name: Run dependency vulnerability scan
+        run: pip-audit -r app/requirements.txt 
+  docker-build-scan:
+    name: Build and scan Docker image
     runs-on: ubuntu-latest
     needs: [code-test, code-scan]
     steps:
@@ -52,17 +48,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Build Docker image
         run: docker build -t secure-devsecops-release-platform:${{ github.sha }} .
-      - name: Docker image scan to warn up to medium vulnerabilities
+      - name: Docker image vulnerability scan
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
-          vuln-type: 'os,library'
-          severity: 'MEDIUM'
-          exit-code: '0'
-      - name: Docker image scan to fail for high/critical vulnerabilities
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
-          vuln-type: 'os,library'
-          severity: 'HIGH,CRITICAL'
+          format: 'table'
           exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
