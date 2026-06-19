@@ -9,7 +9,7 @@ on:
       - main
       - dev
 jobs:
-  test:
+  code-test:
     name: Run application tests
     runs-on: ubuntu-latest
     steps:
@@ -23,12 +23,46 @@ jobs:
         run: pip install -r app/requirements.txt
       - name: Run tests
         run: pytest
+  code-scan:
+    name: Run vulnerability scans
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install vulnerability scan dependencies
+        run: pip install bandit pip-audit
+      - name: Run code vulnerability scan to warn up to medium vulnerabilities
+        run: bandit -r app/ -ii || true
+      - name: Run dependency vulnerability scan to warn up to medium vulnerabilities
+        run: pip-audit -r app/requirements.txt --vulnerability-threshold MEDIUM || true
+      - name: Run code vulnerability scan to fail for high/critical vulnerabilities
+        run: bandit -r app/ -ll -iii
+      - name: Run dependency vulnerability scan to fail for high/critical vulnerabilities
+        run: pip-audit -r app/requirements.txt --vulnerability-threshold HIGH
   docker-build:
     name: Build Docker image
     runs-on: ubuntu-latest
-    needs: test
+    needs: [code-test, code-scan]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build Docker image
         run: docker build -t secure-devsecops-release-platform:${{ github.sha }} .
+      - name: Docker image scan to warn up to medium vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
+          vuln-type: 'os,library'
+          severity: 'MEDIUM'
+          exit-code: '0'
+      - name: Docker image scan to fail for high/critical vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'

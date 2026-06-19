@@ -505,3 +505,129 @@ Docker image builds successfully in GitHub Actions.\
 Docker build depends on the test job passing.\
 Pull requests show pipeline status checks.\
 README explains how the CI pipeline works.
+
+
+# Milestone 5: Security Scanning
+### Goal
+Add DevSecOps security checks into the CI/CD pipeline so the team can detect risky code, vulnerable
+dependencies, and vulnerable container images before deployment.
+
+### Success Criteria
+**Python Code Scan using Bandit**\
+Find common insecure Python coding patterns
+
+**Dependency Scan using pip-audit**\
+Check Python packages for known vulnerabilities
+
+**Container Image Scan using Trivy**\
+Scan the Docker image for OS and library vulnerabilities
+
+**Secrets Check using GitHub Secret Scanning**\
+Helps to prevent passwords, tokens, and keys being committed
+
+**Installing the dependencies for the security tools**
+```sh
+pip install bandit pip-audit
+```
+**Run the code security vulnerability scan locally**
+```sh
+bandit -r app/
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[main]  INFO    running on Python 3.12.3
+Run started:2026-06-19 12:05:12.370610+00:00
+
+Test results:
+        No issues identified.
+
+Code scanned:
+        Total lines of code: 10
+        Total lines skipped (#nosec): 0
+
+Run metrics:
+        Total issues (by severity):
+                Undefined: 0
+                Low: 0
+                Medium: 0
+                High: 0
+        Total issues (by confidence):
+                Undefined: 0
+                Low: 0
+                Medium: 0
+                High: 0
+Files skipped (0):
+```
+**Run the dependency security vulneerability scan locally**
+```sh
+pip audit -r app/requirements.txt
+No known vulnerabilities found
+```
+**Run the Trivy image scan on a Docker image**
+```sh
+docker build -t secure-devsecops-app:latest .
+trivy image secure-devsecops-app:latest
+2026-06-19T13:08:10+01:00       INFO    [vulndb] Need to update DB
+2026-06-19T13:08:10+01:00       INFO    [vulndb] Downloading vulnerability DB...
+2026-06-19T13:08:10+01:00       INFO    [vulndb] Downloading artifact...        repo="mirror.gcr.io/aquasec/trivy-db:2"
+96.90 MiB / 96.90 MiB [---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------] 100.00% 7.44 MiB p/s 13s
+2026-06-19T13:08:24+01:00       INFO    [vulndb] Artifact successfully downloaded       repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-06-19T13:08:24+01:00       INFO    [vuln] Vulnerability scanning is enabled
+2026-06-19T13:08:24+01:00       INFO    [secret] Secret scanning is enabled
+2026-06-19T13:08:24+01:00       INFO    [secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-06-19T13:08:24+01:00       INFO    [secret] Please see https://trivy.dev/docs/v0.71/guide/scanner/secret#recommendation for faster secret detection
+2026-06-19T13:08:25+01:00       INFO    [python] Licenses acquired from one or more METADATA files may be subject to additional terms. Use `--debug` flag to see all affected packages.
+2026-06-19T13:08:25+01:00       INFO    Detected OS     family="debian" version="13.5"
+2026-06-19T13:08:25+01:00       INFO    [debian] Detecting vulnerabilities...   os_version="13" pkg_num=87
+2026-06-19T13:08:25+01:00       INFO    Number of language-specific files       num=1
+2026-06-19T13:08:25+01:00       INFO    [python-pkg] Detecting vulnerabilities...
+2026-06-19T13:08:25+01:00       WARN    Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/docs/v0.71/guide/scanner/vulnerability#severity-selection for details.
+2026-06-19T13:08:25+01:00       INFO    Table result includes only package filenames. Use '--format json' option to get the full path to the package file.
+
+Report Summary
+
+┌──────────────────────────────────────────────────────────────────────────────┬────────────┬─────────────────┬─────────┐
+│                                    Target                                    │    Type    │ Vulnerabilities │ Secrets │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ secure-devsecops-app:latest (debian 13.5)                                    │   debian   │       149       │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/blinker-1.9.0.dist-info/METADATA      │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/click-8.4.1.dist-info/METADATA        │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/flask-3.1.3.dist-info/METADATA        │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/iniconfig-2.3.0.dist-info/METADATA    │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/itsdangerous-2.2.0.dist-info/METADATA │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/jinja2-3.1.6.dist-info/METADATA       │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/markupsafe-3.0.3.dist-info/METADATA   │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/packaging-26.2.dist-info/METADATA     │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/pip-25.0.1.dist-info/METADATA         │ python-pkg │        4        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/pluggy-1.6.0.dist-info/METADATA       │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/pygments-2.20.0.dist-info/METADATA    │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/pytest-9.0.3.dist-info/METADATA       │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/six-1.17.0.dist-info/METADATA         │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.12/site-packages/werkzeug-3.1.8.dist-info/METADATA     │ python-pkg │        0        │    -    │
+└──────────────────────────────────────────────────────────────────────────────┴────────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+```
+
+### Outcomes
+Bandit security scan added.\
+pip-audit dependency scan added.\
+Trivy container image scan added.\
+Security checks can run locally and in GitHub Actions.\
+The team has agreed when the pipeline should fail or warn
