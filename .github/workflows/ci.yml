@@ -40,7 +40,7 @@ jobs:
           targets: app/
           severity: high
       - name: Dependency vulnerability scan
-        uses: pypa/pip-audit-action@v1.1.0
+        uses: pypa/gh-action-pip-audit@v1.1.0
         with:
           inputs: app/requirements.txt
       #   run: pip install bandit pip-audit
