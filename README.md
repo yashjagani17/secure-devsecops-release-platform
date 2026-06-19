@@ -356,7 +356,7 @@ Getting action download info
 Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
 Complete job name: Build Docker image
 ```
-Checkout code
+**Checkout code**
 ```sh
 Run actions/checkout@v4
 Syncing repository: yashjagani17/secure-devsecops-release-platform
@@ -630,4 +630,4 @@ Bandit security scan added.\
 pip-audit dependency scan added.\
 Trivy container image scan added.\
 Security checks can run locally and in GitHub Actions.\
-The team has agreed when the pipeline should fail or warn
+TODO: Decide on when the pipeline should fail or warn
