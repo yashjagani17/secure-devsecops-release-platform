@@ -1,10 +1,17 @@
 FROM python:3.12-slim
 
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN adduser --disabled-password app
 
 WORKDIR /app
 
 COPY --chown=app:app app/requirements.txt .
+
+RUN pip install --upgrade pip
 
 RUN pip install --no-cache-dir -r requirements.txt
 
