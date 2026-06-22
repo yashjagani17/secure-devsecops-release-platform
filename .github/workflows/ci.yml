@@ -29,22 +29,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Run code scan (fail on high)
-        uses: shundor/bandit-action@v1
+      - name: Bandit
+        uses: PyCQA/bandit-action@v1
         with:
-          path: "app/"
-          level: high
-          confidence: medium
-          exit_zero: false
-      - name: Run code scan (warn on medium)
-        if: always()
-        uses: shundor/bandit-action@v1
-        with:
-          path: "app/"
-          level: medium
-          confidence: medium
-          exit_zero: true
+          targets: 'app/'
+          severity: 'medium'
+          confidence: 'medium'
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
