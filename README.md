@@ -646,3 +646,90 @@ pip-audit dependency scan added.\
 Trivy container image scan added.\
 Security checks can run locally and in GitHub Actions.\
 TODO: Decide on when the pipeline should fail or warn
+
+# Milestone 6: Container Registry
+### Goal
+Store the approved Docker image in a container registry so Kubernetes or another deployment platform can pull and run the same tested image.
+
+**Workflow Permissions**\
+Added read/write permissions to GitHub Actions and implemented least privilege permissions for each job.
+```yaml
+    permissions:
+      contents: read
+      packages: write
+```
+
+### Success Criteria
+**Confirm the image appears in GitHub Packages**\
+https://github.com/yashjagani17?tab=packages\
+1 package\
+secure-devsecops-release-platform
+
+**Confirm the commit SHA tag exists**
+```sh
+docker manifest inspect ghcr.io/yashjagani17/secure-devsecops-release-platform:d4b4d64a5c33a857b7ff856c6a25fab0574d0538
+```
+```json
+{
+	"schemaVersion": 2,
+	"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+	"config": {
+		"mediaType": "application/vnd.docker.container.image.v1+json",
+		"size": 7826,
+		"digest": "sha256:1a91a52964e9ef50e71bfcd73d0004ac96c652bbb8ad4827e6de6751b8c21952"
+	}
+  ...
+}
+```
+**Confirm the latest tag exists**
+```sh
+docker manifest inspect ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+```
+```json
+{
+	"schemaVersion": 2,
+	"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+	"config": {
+		"mediaType": "application/vnd.docker.container.image.v1+json",
+		"size": 7826,
+		"digest": "sha256:1a91a52964e9ef50e71bfcd73d0004ac96c652bbb8ad4827e6de6751b8c21952"
+	}
+  ...
+}
+```
+**Check that the image is linked to the correct repository or project**\
+https://github.com/yashjagani17?tab=packages\
+Published 19 minutes ago by yashjagani17 in yashjagani17/secure-devsecops-release-platform
+
+**Pull Docker image from ghcr**
+```sh
+docker pull ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+latest: Pulling from yashjagani17/secure-devsecops-release-platform
+c82e6c1e10eb: Pull complete 
+2008f103c17c: Pull complete 
+a9c4a6069c82: Pull complete 
+ec2b42e38c17: Pull complete 
+6adffa27c985: Pull complete 
+87311c297705: Pull complete 
+10a9024b49e8: Pull complete 
+Digest: sha256:3ba7e9b5d723acf9f4e11b1b7bb9ff5f65d15ae9f5cc47e38d573eccfcd48d53
+Status: Downloaded newer image for ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+```
+**Run the Docker image in a detached state so I can perform tests in same shell**
+```sh
+docker run -d -p 5000:5000 ghcr.io/yashjagani17/secure-devsecops-release-platform:latest 
+ec9f9ebe94e635a0872208aa79b84477cdb647f3d5507359a4111eed0943cabf
+```
+**Testing the health endpoint**
+```sh
+curl http://localhost:5000/health
+{"status":"healthy"}
+```
+
+### Outcomes
+A container registry has been selected\
+Registry authentication is configured securely\
+Docker images are tagged correctly\
+The pipeline pushes approved images to the registry\
+The team can pull and run the image from the registry
