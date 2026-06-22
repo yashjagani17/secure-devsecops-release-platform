@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run dependency scan (fail on vulnerability)
-        uses: pypa/gh-action-pip-audit@v1
+        uses: pypa/gh-action-pip-audit@v1.1.0
         with:
           inputs: app/requirements.txt
   docker-build-scan:
@@ -63,7 +63,7 @@ jobs:
       - name: Build Docker image
         run: docker build -t secure-devsecops-release-platform:${{ github.sha }} .
       - name: Docker image vulnerability scan (fail on critical/high)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
           format: 'table'
@@ -74,7 +74,7 @@ jobs:
           trivyignores: '.trivyignore'
       - name: Docker image vulnerability scan (warn on medium)
         if: always()
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
           format: 'table'
