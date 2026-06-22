@@ -101,11 +101,11 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build image
       run: |
-          docker build -t ghcr.io/yashjagani17/secure-devsecops-project:${{ github.sha }} .
+          docker build -t ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }} .
     - name: Tag image
       run: |
-          docker tag ghcr.io/yashjagani17/secure-devsecops-project:${{ github.sha }} ghcr.io/yashjagani17/secure-devsecops-project:latest
+          docker tag ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }} ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
     - name: Push image
       run: |
-          docker push ghcr.io/yashjagani17/secure-devsecops-project:${{ github.sha }}
-          docker push ghcr.io/yashjagani17/secure-devsecops-project:latest
+          docker push ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }}
+          docker push ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
