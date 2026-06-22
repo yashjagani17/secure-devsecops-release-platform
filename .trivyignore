@@ -1,0 +1,73 @@
+# .trivyignore
+# CVEs with no available fix (status: fix_deferred or affected, no fixed version)
+# Accepted by: yash | Review date: 2026-09-22
+
+# perl-base: fix_deferred in Debian - essential package, cannot be removed
+# CVE-2026-42496: Path traversal via crafted symlinks in Archive::Tar
+CVE-2026-42496
+# CVE-2026-8376: Heap buffer overflow when compiling regex patterns
+CVE-2026-8376
+# CVE-2026-42497: Arbitrary file modification via hardlinks during tar extraction
+CVE-2026-42497
+# CVE-2026-48962: Arbitrary code execution via attacker-controlled output glob in IO::Compress
+CVE-2026-48962
+# CVE-2026-9538: Memory exhaustion via crafted archive in Archive::Tar
+CVE-2026-9538
+# CVE-2025-15649: DoS via malformed DOS date in zip header in IO::Compress
+CVE-2025-15649
+# CVE-2026-12087: Information disclosure via out-of-bounds read in Socket module
+CVE-2026-12087
+# CVE-2026-48959: CPU exhaustion via per-byte read loop in IO::Compress fastForward
+CVE-2026-48959
+# CVE-2026-48961: DoS in zipdetails CLI via malformed Info-ZIP in IO::Compress
+CVE-2026-48961
+# CVE-2026-7010: CRLF injection in HTTP requests via HTTP::Tiny
+CVE-2026-7010
+# CVE-2011-4116: Insecure temporary file handling in File::Temp
+CVE-2011-4116
+
+# ncurses: no fix available in Debian 13
+# CVE-2025-69720: Buffer overflow in ncurses potentially leading to arbitrary code execution
+CVE-2025-69720
+
+# sqlite3: no fix available
+# CVE-2026-11822: Memory corruption vulnerabilities in SQLite before 3.53.2
+CVE-2026-11822
+# CVE-2026-11824: Heap-based buffer overflow in SQLite before 3.53.2
+CVE-2026-11824
+
+# glibc: no fix available
+# CVE-2026-5435: Out-of-bounds write via TSIG record processing
+CVE-2026-5435
+# CVE-2026-5450: Heap buffer overflow in scanf with %mc format specifier
+CVE-2026-5450
+# CVE-2026-5928: Information disclosure or DoS via ungetwc function
+CVE-2026-5928
+# CVE-2026-6238: App crash or uninitialized memory read via crafted DNS response
+CVE-2026-6238
+
+# util-linux: no fix available
+# CVE-2026-27456: TOCTOU race condition in mount when setting up loop devices
+CVE-2026-27456
+# CVE-2026-3184: Access control bypass via improper hostname canonicalization
+CVE-2026-3184
+
+# liblzma5/xz: no fix available
+# CVE-2026-34743: DoS via buffer overflow in XZ Utils index decoding
+CVE-2026-34743
+
+# bzip2: no fix available
+# CVE-2026-42250: DoS in bzip2recover via specially crafted file
+CVE-2026-42250
+
+# zlib: no fix available
+# CVE-2026-27171: DoS via infinite loop in CRC32 combine functions
+CVE-2026-27171
+
+# tar: no fix available
+# CVE-2026-5704: Hidden file injection via crafted archives
+CVE-2026-5704
+
+# libpam: fix_deferred
+# CVE-2026-54411: Plaintext password recovery via timing discrepancy in pam_userdb
+CVE-2026-54411
