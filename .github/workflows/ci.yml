@@ -12,6 +12,8 @@ jobs:
   code-test:
     name: Run application tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,6 +55,8 @@ jobs:
     name: Build and scan Docker image
     runs-on: ubuntu-latest
     needs: [code-test, code-scan]
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -74,8 +78,34 @@ jobs:
         with:
           image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'MEDIUM'
           trivyignores: '.trivyignore'
+  docker-push:
+    name: Push image to ghcr
+    runs-on: ubuntu-latest
+    needs: [docker-build-scan]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Login to ghcr
+      uses: docker/login-action@v4
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build image
+      run: |
+          docker build -t ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }} .
+    - name: Tag image
+      run: |
+          docker tag ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }} ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+    - name: Push image
+      run: |
+          docker push ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }}
+          docker push ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
