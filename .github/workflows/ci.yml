@@ -12,7 +12,13 @@ jobs:
   code-test:
     name: Run application tests
     runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write  # Allows CodeQL/Bandit to upload SARIF results
+      contents: read          # Allows the action to check out your repository code
+      actions: read
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Set up Python
@@ -23,6 +29,7 @@ jobs:
         run: pip install -r app/requirements.txt
       - name: Run tests
         run: pytest
+
   code-scan:
     name: Run application vulnerability scans
     runs-on: ubuntu-latest
@@ -43,6 +50,7 @@ jobs:
         uses: pypa/gh-action-pip-audit@v1.1.0
         with:
           inputs: app/requirements.txt
+          
   docker-build-scan:
     name: Build and scan Docker image
     runs-on: ubuntu-latest
