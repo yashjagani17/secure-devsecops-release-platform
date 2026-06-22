@@ -624,6 +624,21 @@ Legend:
 - '-': Not scanned
 - '0': Clean (no security findings detected)
 ```
+### Hardening the Docker image
+The trivy scan revealed a large number of vulnerabilities that could be exploited such as unpatched OS CVEs, dependencies, Python libraries, etc.\
+\
+**Upgrade OS packages to patch known CVEs**
+```dockerfile
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+```
+**Upgrade pip to patch known CVEs with older libraries**
+```dockerfile
+RUN pip install --upgrade pip
+```
+**Add .trivyignore for accepted risks (CVEs that deferred fix or no fix available)**
 
 ### Outcomes
 Bandit security scan added.\
