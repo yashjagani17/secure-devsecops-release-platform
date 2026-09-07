@@ -107,8 +107,8 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          trivyignores: '.trivyignore'
           severity: 'CRITICAL,HIGH'
+          trivy-version: 'latest'
 
       - name: Low Severity Scan
         if: always()
@@ -119,8 +119,8 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          trivyignores: '.trivyignore'
           severity: 'MEDIUM'
+          trivy-version: 'latest'
 
   push-image:
     name: Push Image to GHCR
