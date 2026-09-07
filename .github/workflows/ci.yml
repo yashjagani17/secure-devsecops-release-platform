@@ -108,7 +108,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          trivy-version: 'latest'
+          version: 'latest'
 
       - name: Low Severity Scan
         if: always()
@@ -120,7 +120,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'MEDIUM'
-          trivy-version: 'latest'
+          version: 'latest'
 
   push-image:
     name: Push Image to GHCR
