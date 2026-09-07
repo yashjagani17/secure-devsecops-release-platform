@@ -1,4 +1,5 @@
 name: CI Pipeline
+
 on:
   push:
     branches:
@@ -8,104 +9,149 @@ on:
     branches:
       - main
       - dev
-jobs:
-  code-test:
-    name: Run application tests
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install dependencies
-        run: pip install -r app/requirements.txt
-      - name: Run tests
-        run: pytest
 
-  code-scan:
-    name: Run application vulnerability scans
+jobs:
+
+  codeql:
+    name: Code Scan
     runs-on: ubuntu-latest
+    if: github.event.repository.visibility == 'public'
     permissions:
       security-events: write
       contents: read
-      actions: read
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Run code scan (fail on high/critical)
-        uses: PyCQA/bandit-action@v1
+
+      - name: Initialise CodeQL
+        uses: github/codeql-action/init@v4
         with:
-          targets: 'app/'
-          severity: 'medium'
-          confidence: 'medium'
-      - name: Set up Python
+          languages: python
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+
+  pip-audit:
+    name: Dependency Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run dependency scan (fail on vulnerability)
+      - name: Run Dependency Scan
         uses: pypa/gh-action-pip-audit@v1.1.0
         with:
           inputs: app/requirements.txt
 
-  docker-build-scan:
-    name: Build and scan Docker image
+  pytest:
+    name: Pytest
+    needs: [codeql, pip-audit]
     runs-on: ubuntu-latest
-    needs: [code-test, code-scan]
     permissions:
       contents: read
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Dependencies
+        run: pip install -r app/requirements.txt
+      - name: Run Tests
+        run: pytest
+
+  docker-build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [codeql, pip-audit, pytest]
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Build Docker image
+
+      - name: Build Image
         run: docker build -t secure-devsecops-release-platform:${{ github.sha }} .
-      - name: Docker image vulnerability scan (fail on critical/high)
+
+      - name: Save Image
+        run: docker save secure-devsecops-release-platform:${{ github.sha }} -o secure-devsecops-release-platform-image.tar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: secure-devsecops-release-platform-image.tar
+          retention-days: 1
+
+  trivy-scan:
+    name: Trivy Scan
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+      - name: High Severity Scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
+          input: secure-devsecops-release-platform-image.tar
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
           trivyignores: '.trivyignore'
-      - name: Docker image vulnerability scan (warn on medium)
+          severity: 'CRITICAL,HIGH'
+
+      - name: Scan (warn on medium)
         if: always()
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 'secure-devsecops-release-platform:${{ github.sha }}'
+          input: secure-devsecops-release-platform-image.tar
           format: 'table'
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'MEDIUM'
           trivyignores: '.trivyignore'
-  docker-push:
-    name: Push image to ghcr
+          severity: 'MEDIUM'
+
+  push-image:
+    name: Push Image to GHCR
     runs-on: ubuntu-latest
-    needs: [docker-build-scan]
+    needs: [docker-build, trivy-scan]
+    if: github.event_name == 'push'
     permissions:
       contents: read
       packages: write
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Login to ghcr
-      uses: docker/login-action@v4
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build image
-      run: |
-          docker build -t ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }} .
-    - name: Tag image
-      run: |
-          docker tag ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }} ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
-    - name: Push image
-      run: |
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Image
+        run: docker load -i secure-devsecops-release-platform-image.tar
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag image
+        run: |
+          docker tag secure-devsecops-release-platform:${{ github.sha }} ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }}
+          docker tag secure-devsecops-release-platform:${{ github.sha }} ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+
+      - name: Push image
+        run: |
           docker push ghcr.io/yashjagani17/secure-devsecops-release-platform:${{ github.sha }}
           docker push ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
