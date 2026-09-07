@@ -733,3 +733,264 @@ Registry authentication is configured securely\
 Docker images are tagged correctly\
 The pipeline pushes approved images to the registry\
 The team can pull and run the image from the registry
+
+# Milestone 7: Infrastructure and Kubernetes Deployment
+### Goal
+Deploy the containerised application to a Kubernetes environment and use Infrastructure as Code to make the setup repeatable. 
+This milestone connects the container registry from Milestone 6 to a working deployment platform.
+
+### Flow
+**1. The user visits secure-devsecops.local/health**\
+**2. The OS looks in the /etc/hosts for local DNS mapping and resolves secure-devsecops.local to minikube's node IP address**\
+**3. The request hits port 80 of the minikube VM and NGINX is listening to check the incoming request against ingress rules**\
+**4. If the host matches secure-devsecops.local, NGINX will route the request to the flask-app-service**\
+**5. flask-app-service picks one of the matching pods (implementing load balancing) and forwards the request**\
+**6. The flask container running on the pod listening on port 5000 processes the request to /health and returns a response**
+**7. Throughout the process, the deployment functions to manage the lifecycle of the pods (monitor and replace if dead)**
+
+### Kubernetes
+**The Deployment Environment**\
+A local Kubernetes cluster using Minikube.
+
+### Deployment
+**Create the namespace**
+```sh
+kubectl apply -f k8s/namespace.yaml
+namespace/secure-devsecops created
+```
+**Confirm that the namespace exists and is active**
+```sh
+kubectl get namespaces
+NAME               STATUS   AGE
+default            Active   28d
+ingress-nginx      Active   46m
+kube-node-lease    Active   28d
+kube-public        Active   28d
+kube-system        Active   28d
+secure-devsecops   Active   17s
+```
+**asdf**
+```sh
+kubectl apply -f k8s/deployment.yaml
+deployment.apps/flask-app-deployment created
+```
+**Check for pods**
+```sh
+kubectl get pods -n secure-devsecops
+NAME                                    READY   STATUS    RESTARTS   AGE
+flask-app-deployment-6cb5c78d89-ddkwp   1/1     Running   0          89s
+flask-app-deployment-6cb5c78d89-nnvcc   1/1     Running   0          89s
+```
+**Create the service (load balancer for pods)**
+```sh
+kubectl apply -f k8s/service.yaml
+service/flask-app-service created
+```
+**Confirm that the service has a ClusterIP**
+```sh
+kubectl get svc -n secure-devsecops
+NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+flask-app-service   ClusterIP   10.102.103.120   <none>        80/TCP    11s
+```
+**Create the ingress (external routing rule)**
+```sh
+kubectl apply -f k8s/ingress.yaml
+ingress.networking.k8s.io/flask-app-ingress created
+```
+**Confirm the ingress exists**
+```sh
+kubectl get ingress -n secure-devsecops
+NAME                CLASS   HOSTS                    ADDRESS        PORTS   AGE
+flask-app-ingress   nginx   secure-devsecops.local   192.168.49.2   80      4m35s
+```
+
+### Verification
+**Check that the pods are running**
+```sh
+kubectl get all -n secure-devsecops
+```
+```sh
+NAME                                        READY   STATUS    RESTARTS   AGE
+pod/flask-app-deployment-6cb5c78d89-fcdw4   1/1     Running   0          18m
+pod/flask-app-deployment-6cb5c78d89-mhj5b   1/1     Running   0          18m
+
+NAME                        TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+service/flask-app-service   ClusterIP   10.97.67.48   <none>        80/TCP    18m
+
+NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/flask-app-deployment   2/2     2            2           18m
+
+NAME                                              DESIRED   CURRENT   READY   AGE
+replicaset.apps/flask-app-deployment-6cb5c78d89   2         2         2       18m
+```
+**Check that the service has been created**
+```sh
+kubectl describe pod -n secure-devsecops
+```
+```sh
+Name:             flask-app-deployment-6cb5c78d89-fcdw4
+Namespace:        secure-devsecops
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Thu, 02 Jul 2026 13:17:41 +0100
+Labels:           app=flask-app
+                  pod-template-hash=6cb5c78d89
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.5
+IPs:
+  IP:           10.244.0.5
+Controlled By:  ReplicaSet/flask-app-deployment-6cb5c78d89
+Containers:
+  flask-app:
+    Container ID:   docker://a044d7786e76309cec574166f99dd4dde8390514109cce4f1d08c27cc64f3681
+    Image:          ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+    Image ID:       docker-pullable://ghcr.io/yashjagani17/secure-devsecops-release-platform@sha256:1263fc913173acb2e530a3da90fd1c3c28f0a814d1a11232b5e0cfa034b58f09
+    Port:           5000/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 02 Jul 2026 13:17:49 +0100
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      cpu:     250m
+      memory:  256Mi
+    Requests:
+      cpu:        100m
+      memory:     128Mi
+    Liveness:     http-get http://:5000/health delay=15s timeout=1s period=20s #success=1 #failure=3
+    Readiness:    http-get http://:5000/health delay=5s timeout=1s period=10s #success=1 #failure=3
+    Environment:  <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-v6cwk (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-v6cwk:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  19m   default-scheduler  Successfully assigned secure-devsecops/flask-app-deployment-6cb5c78d89-fcdw4 to minikube
+  Normal  Pulling    19m   kubelet            spec.containers{flask-app}: Pulling image "ghcr.io/yashjagani17/secure-devsecops-release-platform:latest"
+  Normal  Pulled     19m   kubelet            spec.containers{flask-app}: Successfully pulled image "ghcr.io/yashjagani17/secure-devsecops-release-platform:latest" in 6.092s (6.092s including waiting). Image size: 152897531 bytes.
+  Normal  Created    19m   kubelet            spec.containers{flask-app}: Container created
+  Normal  Started    19m   kubelet            spec.containers{flask-app}: Container started
+
+
+Name:             flask-app-deployment-6cb5c78d89-mhj5b
+Namespace:        secure-devsecops
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Thu, 02 Jul 2026 13:17:41 +0100
+Labels:           app=flask-app
+                  pod-template-hash=6cb5c78d89
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.4
+IPs:
+  IP:           10.244.0.4
+Controlled By:  ReplicaSet/flask-app-deployment-6cb5c78d89
+Containers:
+  flask-app:
+    Container ID:   docker://f4c77c5dec8218c143a73dd6529f3a592aacb558548038708fd3811723f4c8e9
+    Image:          ghcr.io/yashjagani17/secure-devsecops-release-platform:latest
+    Image ID:       docker-pullable://ghcr.io/yashjagani17/secure-devsecops-release-platform@sha256:1263fc913173acb2e530a3da90fd1c3c28f0a814d1a11232b5e0cfa034b58f09
+    Port:           5000/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 02 Jul 2026 13:17:49 +0100
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      cpu:     250m
+      memory:  256Mi
+    Requests:
+      cpu:        100m
+      memory:     128Mi
+    Liveness:     http-get http://:5000/health delay=15s timeout=1s period=20s #success=1 #failure=3
+    Readiness:    http-get http://:5000/health delay=5s timeout=1s period=10s #success=1 #failure=3
+    Environment:  <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-vh4gn (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-vh4gn:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  19m   default-scheduler  Successfully assigned secure-devsecops/flask-app-deployment-6cb5c78d89-mhj5b to minikube
+  Normal  Pulling    19m   kubelet            spec.containers{flask-app}: Pulling image "ghcr.io/yashjagani17/secure-devsecops-release-platform:latest"
+  Normal  Pulled     19m   kubelet            spec.containers{flask-app}: Successfully pulled image "ghcr.io/yashjagani17/secure-devsecops-release-platform:latest" in 712ms (6.804s including waiting). Image size: 152897531 bytes.
+  Normal  Created    19m   kubelet            spec.containers{flask-app}: Container created
+  Normal  Started    19m   kubelet            spec.containers{flask-app}: Container started
+
+```
+**Check that ingress is routing traffic correctly**
+```sh
+kubectl logs -n secure-devsecops deploy/flask-app-deployment
+```
+```sh
+kubectl logs -n secure-devsecops deploy/flask-app-deployment
+Found 2 pods, using pod/flask-app-deployment-6cb5c78d89-fcdw4
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.244.0.5:5000
+Press CTRL+C to quit
+10.244.0.1 - - [02/Jul/2026 12:18:00] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:18:10] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:18:20] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:18:22] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:18:30] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:18:40] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:18:42] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:18:50] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:00] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:02] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:10] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:20] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:22] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:30] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:40] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:42] "GET /health HTTP/1.1" 200 -
+10.244.0.1 - - [02/Jul/2026 12:19:50] "GET /health HTTP/1.1" 200 -
+```
+**Open the application in a browser or test it with curl and confirm that the /health endpoint returns healthy**
+```sh
+curl http://secure-devsecops.local/health
+```
+```sh
+{"status":"healthy"}
+```
