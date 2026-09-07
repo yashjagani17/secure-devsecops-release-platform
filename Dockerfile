@@ -1,19 +1,27 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+RUN python -m pip install --no-cache-dir --upgrade pip
+
+COPY app/requirements.txt .
+
+RUN python -m pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+
+FROM python:3.12-slim AS runner
 
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN adduser --disabled-password app
 
 WORKDIR /app
 
-COPY --chown=app:app app/requirements.txt .
-
-RUN pip install --upgrade pip
-
-RUN pip install --no-cache-dir -r requirements.txt
+COPY --from=builder /install /usr/local
 
 COPY --chown=app:app app/ .
 
